@@ -16,21 +16,33 @@ public struct Shoki {
 
 extension Shoki {
     
+    func markdown(_ message: String) {
+        markdownResolver(message)
+    }
+    
+    func message(_ message: String) {
+        messageResolver(message)
+    }
+    
+}
+
+extension Shoki {
+    
     public func report(_ result: CheckResult) {
         
-        markdownResolver(result.markdownTitle)
+        markdown(result.markdownTitle)
         
         if !result.markdownMessage.isEmpty {
-            markdownResolver(result.markdownMessage)
+            markdown(result.markdownMessage)
 
         }
         
         if !result.markdownTodos.isEmpty {
-            markdownResolver(result.markdownTodos)
+            markdown(result.markdownTodos)
         }
         
         if result.warningsCount == 0 && result.errorsCount == 0 {
-            messageResolver("Good Job :white_flower:")
+            message("Good Job :white_flower:")
         }
         
     }
