@@ -11,7 +11,7 @@ import XCTest
 final class ShokiTests: XCTestCase {
     
     private typealias ExpectedString = (line: UInt, input: String, expectation: XCTestExpectation)
-    private func makeResolver(_ expectations: [ExpectedString]) -> (String) -> Void {
+    private func makeExecutor(_ expectations: [ExpectedString]) -> (String) -> Void {
         var expectations = expectations
         return {
             guard let currentExpectation = expectations.first else {
@@ -54,15 +54,15 @@ final class ShokiTests: XCTestCase {
             let expectedTodos = "- [ ] Good Todo"
             let expectedReward = "Good Job :white_flower:"
             
-            let markdownResolver = makeResolver([
+            let markdownExecutor = makeExecutor([
                 (#line, expectedTitle, titleExpectation),
                 (#line, expectedMessage, messageExpectation),
                 (#line, expectedTodos, todosExpectation),
             ])
-            let messageResolver = makeResolver([
+            let messageExecutor = makeExecutor([
                 (#line, expectedReward, rewardExpectation)
             ])
-            let shoki = Shoki(markdownResolver: markdownResolver, messageResolver: messageResolver)
+            let shoki = Shoki(markdownExecutor: markdownExecutor, messageExecutor: messageExecutor)
             
             shoki.report(inputResult)
             wait(for: [titleExpectation, messageExpectation, todosExpectation, rewardExpectation], timeout: 0, enforceOrder: true)
@@ -79,13 +79,13 @@ final class ShokiTests: XCTestCase {
             let expectedTitle = "## Empty Result"
             let expectedReward = "Good Job :white_flower:"
             
-            let markdownResolver = makeResolver([
+            let markdownExecutor = makeExecutor([
                 (#line, expectedTitle, titleExpectation),
             ])
-            let messageResolver = makeResolver([
+            let messageExecutor = makeExecutor([
                 (#line, expectedReward, rewardExpectation),
             ])
-            let shoki = Shoki(markdownResolver: markdownResolver, messageResolver: messageResolver)
+            let shoki = Shoki(markdownExecutor: markdownExecutor, messageExecutor: messageExecutor)
             
             shoki.report(inputResult)
             wait(for: [titleExpectation, rewardExpectation], timeout: 0, enforceOrder: true)
@@ -110,12 +110,12 @@ final class ShokiTests: XCTestCase {
             Rejected Check | :no_good:
             """
             
-            let markdownResolver = makeResolver([
+            let markdownExecutor = makeExecutor([
                 (#line, expectedTitle, titleExpectation),
                 (#line, expectedMessage, messageExpectation),
             ])
-            let messageResolver = makeResolver([])
-            let shoki = Shoki(markdownResolver: markdownResolver, messageResolver: messageResolver)
+            let messageExecutor = makeExecutor([])
+            let shoki = Shoki(markdownExecutor: markdownExecutor, messageExecutor: messageExecutor)
             
             shoki.report(inputResult)
             wait(for: [titleExpectation, messageExpectation], timeout: 0, enforceOrder: true)

@@ -13,9 +13,6 @@ final class CheckResultTests: XCTestCase {
             XCTAssertEqual(checkResult.errorsCount, 0)
             XCTAssertEqual(checkResult.markdownTitle, "## Test Check")
             XCTAssertEqual(checkResult.markdownMessage, """
-                                                        Checking Item | Result
-                                                        | ---| --- |
-                                                        
                                                         """)
             XCTAssertEqual(checkResult.markdownTodos, """
                                                       """)
