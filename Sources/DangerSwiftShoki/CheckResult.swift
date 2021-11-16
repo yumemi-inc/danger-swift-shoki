@@ -69,6 +69,10 @@ public struct CheckResult {
     
     public var markdownMessage: String {
         
+        guard !messages.isEmpty else {
+            return ""
+        }
+        
         let chartHeader = """
             Checking Item | Result
             | ---| --- |
@@ -83,6 +87,10 @@ public struct CheckResult {
     }
     
     public var markdownTodos: String {
+        
+        guard !todos.isEmpty else {
+            return ""
+        }
         
         let todoContent = todos.map {
             "- [ ] \($0)"
