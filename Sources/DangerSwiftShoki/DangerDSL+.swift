@@ -9,23 +9,9 @@ import Danger
 
 extension DangerDSL {
     
-    public func report(_ result: CheckResult) {
-        
-        markdown(result.markdownTitle)
-        
-        if !result.markdownMessage.isEmpty {
-            markdown(result.markdownMessage)
-
-        }
-        
-        if !result.markdownTodos.isEmpty {
-            markdown(result.markdownTodos)
-        }
-        
-        if result.warningsCount == 0 && result.errorsCount == 0 {
-            message("Good Job :white_flower:")
-        }
-        
+    public var shoki: Shoki {
+        return .init(markdownResolver: { markdown($0) },
+                     messageResolver: { message($0) })
     }
     
 }
