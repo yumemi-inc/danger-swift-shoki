@@ -9,19 +9,27 @@ import Danger
 
 public struct Shoki {
     
-    let markdownResolver: (String) -> Void
-    let messageResolver: (String) -> Void
+    private let markdownExecutor: (String) -> Void
+    private let messageExecutor: (String) -> Void
+    
+    init(
+        markdownExecutor: @escaping (String) -> Void,
+        messageExecutor: @escaping (String) -> Void
+    ) {
+        self.markdownExecutor = markdownExecutor
+        self.messageExecutor = messageExecutor
+    }
     
 }
 
 extension Shoki {
     
     func markdown(_ message: String) {
-        markdownResolver(message)
+        markdownExecutor(message)
     }
     
     func message(_ message: String) {
-        messageResolver(message)
+        messageExecutor(message)
     }
     
 }
