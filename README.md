@@ -8,7 +8,7 @@ A danger-swift plug-in to manage/post danger checking results with markdown styl
 
 - Add dependency package to your `Package.swift` file which you import danger-swift
 
-    ```
+    ```swift
     // swift-tools-version:5.5
     ...
     let package = Package(
@@ -25,7 +25,7 @@ A danger-swift plug-in to manage/post danger checking results with markdown styl
 
 - Add the correct import to your `Dangerfile.swift` file
 
-    ```
+    ```swift
     import DangerSwiftShoki
     ```
 
@@ -33,7 +33,7 @@ A danger-swift plug-in to manage/post danger checking results with markdown styl
 
 - Just add the dependency import to your `Dangerfile.swift` file like this:
 
-    ```
+    ```swift
     import DangerSwiftShoki // package: https://github.com/yumemi-inc/danger-swift-shoki.git
     ```
 
@@ -41,13 +41,13 @@ A danger-swift plug-in to manage/post danger checking results with markdown styl
 
 - First of all create a result data structure with `CheckResult` initializer
 
-    ```
+    ```swift
     var checkResult = CheckResult(title: "My Check")
     ```
 
 - Then you can perform any check with `check` method, by returning your check result in the trailing `execution` closure
 
-    ```
+    ```swift
     checkResult.check("Test Result Check") {
         if testPassed {
             return .good
@@ -67,13 +67,13 @@ A danger-swift plug-in to manage/post danger checking results with markdown styl
 
 - You can also ask reviewers not to forget to do some manual checks with `askReviewer` method if needed
 
-    ```
+    ```swift
     checkResult.askReviewer(to: "Check whether commit messages are correctly formatted or not")
     ```
 
 - At last post the whole check result with `shoki.report` method which is available for `DangerDSL` instances
 
-    ```
+    ```swift
     danger.shoki.report(checkResult) // Assume you have initialized `danger` by code like `let danger = Danger()`
     ```
 
