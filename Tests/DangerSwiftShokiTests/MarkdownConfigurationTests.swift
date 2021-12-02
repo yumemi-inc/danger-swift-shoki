@@ -31,7 +31,9 @@ final class MarkdownConfigurationTests: XCTestCase {
             XCTAssertEqual(MC.defaultMessageMarkdown(checkItems: emptyCheckItems), expectedEmptyOutput)
             XCTAssertEqual(mc.messageMarkdownFormatter(emptyCheckItems), expectedEmptyOutput)
             
-            let singleElementCheckItems: [Report.CheckItem] = [("Test 1", .good)]
+            let singleElementCheckItems: [Report.CheckItem] = [
+                .init(title: "Test 1", result: .good)
+            ]
             let expectedSingleElementOutput = """
                 Checking Item | Result
                 | ---| --- |
@@ -40,7 +42,10 @@ final class MarkdownConfigurationTests: XCTestCase {
             XCTAssertEqual(MC.defaultMessageMarkdown(checkItems: singleElementCheckItems), expectedSingleElementOutput)
             XCTAssertEqual(mc.messageMarkdownFormatter(singleElementCheckItems), expectedSingleElementOutput)
             
-            let multipleElementCheckItems: [Report.CheckItem] = [("Test 2", .acceptable(warningMessage: nil)), ("Test 3", .rejected(failureMessage: "NG"))]
+            let multipleElementCheckItems: [Report.CheckItem] = [
+                .init(title: "Test 2", result: .acceptable(warningMessage: nil)),
+                .init(title: "Test 3", result: .rejected(failureMessage: "NG"))
+            ]
             let expectedMultipleElementOutput = """
                 Checking Item | Result
                 | ---| --- |
