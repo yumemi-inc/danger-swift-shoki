@@ -33,8 +33,8 @@ final class ShokiTests: XCTestCase {
         
         XCTContext.runActivity(named: "Good CheckResult") { _ in
             
-            let inputResult = { () -> CheckResult in
-                var result = CheckResult(title: "Good Result")
+            let inputReport = { () -> Report in
+                var result = Report(title: "Good Result")
                 result.checkItems.append(("Good Check", .good))
                 result.todos.append("Good Todo")
                 return result
@@ -69,14 +69,14 @@ final class ShokiTests: XCTestCase {
                 failureExecutor: { _ in XCTFail() }
             )
             
-            shoki.report(inputResult)
+            shoki.report(inputReport)
             wait(for: [titleExpectation, messageExpectation, todosExpectation, rewardExpectation], timeout: 0, enforceOrder: true)
             
         }
         
         XCTContext.runActivity(named: "Empty CheckResult") { _ in
             
-            let inputResult = CheckResult(title: "Empty Result")
+            let inputReport = Report(title: "Empty Result")
             
             let titleExpectation = expectation(description: "Title")
             let rewardExpectation = expectation(description: "Reward")
@@ -97,15 +97,15 @@ final class ShokiTests: XCTestCase {
                 failureExecutor: { _ in XCTFail() }
             )
             
-            shoki.report(inputResult)
+            shoki.report(inputReport)
             wait(for: [titleExpectation, rewardExpectation], timeout: 0, enforceOrder: true)
             
         }
         
         XCTContext.runActivity(named: "Rejected Result") { _ in
             
-            let inputResult = { () -> CheckResult in
-                var result = CheckResult(title: "Rejected Result")
+            let inputReport = { () -> Report in
+                var result = Report(title: "Rejected Result")
                 result.checkItems.append(("Rejected Check", .rejected(failureMessage: nil)))
                 return result
             }()
@@ -137,7 +137,7 @@ final class ShokiTests: XCTestCase {
                 failureExecutor: failureExecutor
             )
             
-            shoki.report(inputResult)
+            shoki.report(inputReport)
             wait(for: [titleExpectation, messageExpectation, failureExpectation], timeout: 0, enforceOrder: true)
             
         }

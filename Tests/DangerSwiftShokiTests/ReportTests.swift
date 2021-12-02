@@ -1,11 +1,11 @@
 import XCTest
 @testable import DangerSwiftShoki
 
-final class CheckResultTests: XCTestCase {
+final class ReportTests: XCTestCase {
     
-    func test_checkResultLife() {
+    func test_reportUsageScenario() {
         
-        var checkResult = CheckResult(title: "Test Check")
+        var checkResult = Report(title: "Test Check")
         
         XCTContext.runActivity(named: "Initialize CheckResult") { _ in
             XCTAssertEqual(checkResult.title, "Test Check")
@@ -72,7 +72,7 @@ final class CheckResultTests: XCTestCase {
     
 }
 
-private func XCTAssertEqual(_ itemA: [CheckResult.CheckItem], _ itemB: [CheckResult.CheckItem], line: UInt = #line) {
+private func XCTAssertEqual(_ itemA: [Report.CheckItem], _ itemB: [Report.CheckItem], line: UInt = #line) {
     
     XCTAssertEqual(itemA.count, itemB.count, line: line)
     
@@ -83,7 +83,7 @@ private func XCTAssertEqual(_ itemA: [CheckResult.CheckItem], _ itemB: [CheckRes
     
 }
 
-private func XCTAssertEqual(_ itemA: AnyCollection<CheckResult.WarningMessage>, _ itemB: [CheckResult.WarningMessage], line: UInt = #line) {
+private func XCTAssertEqual(_ itemA: AnyCollection<Report.WarningMessage>, _ itemB: [Report.WarningMessage], line: UInt = #line) {
     
     XCTAssertEqual(itemA.count, itemB.count, line: line)
     
