@@ -50,53 +50,53 @@ extension Shoki {
 
 extension Shoki {
     
-    public func makeInitialCheckResult(title: String) -> CheckResult {
+    public func makeInitialReport(title: String) -> Report {
         
         .init(title: title)
         
     }
     
-    public func check(_ title: String, into result: inout CheckResult, execution: () -> CheckResult.Result) {
+    public func check(_ title: String, into report: inout Report, execution: () -> Report.Result) {
         
         let executionResult = execution()
-        result.checkItems.append((title, executionResult))
+        report.checkItems.append((title, executionResult))
         
     }
     
-    public func askReviewer(to taskToDo: String, into result: inout CheckResult) {
+    public func askReviewer(to taskToDo: String, into report: inout Report) {
         
-        result.todos.append(taskToDo)
+        report.todos.append(taskToDo)
         
     }
     
-    public func report(_ result: CheckResult, using configuration: MarkdownConfiguration = .default) {
+    public func report(_ report: Report, using configuration: MarkdownConfiguration = .default) {
         
-        let markdownTitle = configuration.titleMarkdownFormatter(result.title)
+        let markdownTitle = configuration.titleMarkdownFormatter(report.title)
         if !markdownTitle.isEmpty {
             markdown(markdownTitle)
         }
         
-        let markdownMessage = configuration.messageMarkdownFormatter(result.checkItems)
+        let markdownMessage = configuration.messageMarkdownFormatter(report.checkItems)
         if !markdownMessage.isEmpty {
             markdown(markdownMessage)
         }
         
-        for warning in result.warnings {
+        for warning in report.warnings {
             let markdownWarning = configuration.warningMarkdownFormatter(warning)
             warn(markdownWarning)
         }
         
-        for failure in result.failures {
+        for failure in report.failures {
             let markdownFailure = configuration.failureMarkdownFormatter(failure)
             fail(markdownFailure)
         }
         
-        let markdownTodos = configuration.todosMarkdownFormatter(result.todos)
+        let markdownTodos = configuration.todosMarkdownFormatter(report.todos)
         if !markdownTodos.isEmpty {
             markdown(markdownTodos)
         }
 
-        if result.warnings.isEmpty && result.failures.isEmpty {
+        if report.warnings.isEmpty && report.failures.isEmpty {
             message(configuration.congratulationsMessage)
         }
         

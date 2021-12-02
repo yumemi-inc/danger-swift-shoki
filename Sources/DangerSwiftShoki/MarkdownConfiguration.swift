@@ -8,9 +8,9 @@
 public struct MarkdownConfiguration {
     
     var titleMarkdownFormatter: (String) -> String
-    var messageMarkdownFormatter: ([CheckResult.CheckItem]) -> String
-    var warningMarkdownFormatter: (CheckResult.WarningMessage) -> String
-    var failureMarkdownFormatter: (CheckResult.FailureMessage) -> String
+    var messageMarkdownFormatter: ([Report.CheckItem]) -> String
+    var warningMarkdownFormatter: (Report.WarningMessage) -> String
+    var failureMarkdownFormatter: (Report.FailureMessage) -> String
     var todosMarkdownFormatter: ([String]) -> String
     var congratulationsMessage: String
     
@@ -20,7 +20,7 @@ public struct MarkdownConfiguration {
         
     }
     
-    public static func defaultMessageMarkdown(checkItems: [CheckResult.CheckItem]) -> String {
+    public static func defaultMessageMarkdown(checkItems: [Report.CheckItem]) -> String {
         
         guard !checkItems.isEmpty else {
             return ""
@@ -39,14 +39,14 @@ public struct MarkdownConfiguration {
         
     }
     
-    public static func defaultWarningMarkdown(warning: CheckResult.WarningMessage) -> String {
+    public static func defaultWarningMarkdown(warning: Report.WarningMessage) -> String {
         
         let messageSuffix = warning.message.map { ": \($0)" } ?? " has a warning."
         return warning.title + messageSuffix
         
     }
     
-    public static func defaultFailureMarkdown(failure: CheckResult.FailureMessage) -> String {
+    public static func defaultFailureMarkdown(failure: Report.FailureMessage) -> String {
         
         let messageSuffix = failure.message.map { ": \($0)" } ?? " failed."
         return failure.title + messageSuffix
@@ -75,9 +75,9 @@ public struct MarkdownConfiguration {
     
     public init(
         titleMarkdownFormatter: @escaping (String) -> String = defaultTitleMarkdown(title:),
-        messageMarkdownFormatter: @escaping ([CheckResult.CheckItem]) -> String = defaultMessageMarkdown(checkItems:),
-        warningMarkdownFormatter: @escaping (CheckResult.WarningMessage) -> String = defaultWarningMarkdown(warning:),
-        failureMarkdownFormatter: @escaping (CheckResult.FailureMessage) -> String = defaultFailureMarkdown(failure:),
+        messageMarkdownFormatter: @escaping ([Report.CheckItem]) -> String = defaultMessageMarkdown(checkItems:),
+        warningMarkdownFormatter: @escaping (Report.WarningMessage) -> String = defaultWarningMarkdown(warning:),
+        failureMarkdownFormatter: @escaping (Report.FailureMessage) -> String = defaultFailureMarkdown(failure:),
         todosMarkdownFormatter: @escaping ([String]) -> String = defaultTodosMarkdown(todos:),
         congratulationsMessage: String = defaultCongratulationsMessage
     ) {
@@ -95,7 +95,7 @@ public struct MarkdownConfiguration {
     
 }
 
-private extension CheckResult.Result {
+private extension Report.Result {
     
     var markdownSymbol: String {
         switch self {

@@ -1,11 +1,11 @@
 //
-//  CheckResult.swift
+//  Report.swift
 //  
 //
 //  Created by 史 翔新 on 2020/07/11.
 //
 
-public struct CheckResult {
+public struct Report {
     
     public enum Result: Equatable {
         case good
@@ -67,14 +67,14 @@ public struct CheckResult {
         self.title = title
     }
     
-    @available(*, deprecated, message: "It's `Shoki`'s responsibility to format a message, not `CheckResult`'s, so stop using this property to get the formatted title, which you shouldn't have to care at first place.")
+    @available(*, deprecated, message: "It's `Shoki`'s responsibility to format a message, not `CheckResult`'s, so stop using this property to get the formatted title, which you shouldn't have to care about at first place.")
     public var markdownTitle: String {
         
         "## " + title
         
     }
     
-    @available(*, deprecated, message: "It's `Shoki`'s responsibility to format a message, not `CheckResult`'s, so stop using this property to get the formatted message, which you shouldn't have to care at first place.")
+    @available(*, deprecated, message: "It's `Shoki`'s responsibility to format a message, not `CheckResult`'s, so stop using this property to get the formatted message, which you shouldn't have to care about at first place.")
     public var markdownMessage: String {
         
         guard !checkItems.isEmpty else {
@@ -94,7 +94,7 @@ public struct CheckResult {
         
     }
     
-    @available(*, deprecated, message: "It's `Shoki`'s responsibility to format a message, not `CheckResult`'s, so stop using this property to get the formatted todos, which you shouldn't have to care at first place.")
+    @available(*, deprecated, message: "It's `Shoki`'s responsibility to format a message, not `CheckResult`'s, so stop using this property to get the formatted todos, which you shouldn't have to care about at first place.")
     public var markdownTodos: String {
         
         guard !todos.isEmpty else {
@@ -111,7 +111,11 @@ public struct CheckResult {
     
 }
 
-private extension CheckResult.Result {
+
+@available(*, deprecated, renamed: "Report")
+public typealias CheckResult = Report
+
+private extension Report.Result {
     
     var markdownSymbol: String {
         switch self {
