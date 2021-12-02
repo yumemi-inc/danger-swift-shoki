@@ -9,100 +9,87 @@ final class CheckResultTests: XCTestCase {
         
         XCTContext.runActivity(named: "Initialize CheckResult") { _ in
             XCTAssertEqual(checkResult.title, "Test Check")
-            XCTAssertEqual(checkResult.warningsCount, 0)
-            XCTAssertEqual(checkResult.errorsCount, 0)
-            XCTAssertEqual(checkResult.markdownTitle, "## Test Check")
-            XCTAssertEqual(checkResult.markdownMessage, """
-                                                        """)
-            XCTAssertEqual(checkResult.markdownTodos, """
-                                                      """)
+            XCTAssertEqual(checkResult.checkItems, [])
+            XCTAssertEqual(checkResult.todos, [])
+            XCTAssertEqual(checkResult.warnings, [])
+            XCTAssertEqual(checkResult.failures, [])
         }
         
         XCTContext.runActivity(named: "Add Check Item with Good Result") { _ in
-            checkResult.check("Good Check", execution: { .good })
+            checkResult.checkItems.append(("Good Check", .good))
             XCTAssertEqual(checkResult.title, "Test Check")
-            XCTAssertEqual(checkResult.warningsCount, 0)
-            XCTAssertEqual(checkResult.errorsCount, 0)
-            XCTAssertEqual(checkResult.markdownTitle, "## Test Check")
-            XCTAssertEqual(checkResult.markdownMessage, """
-                                                        Checking Item | Result
-                                                        | ---| --- |
-                                                        Good Check | :tada:
-                                                        """)
-            XCTAssertEqual(checkResult.markdownTodos, """
-                                                      """)
+            XCTAssertEqual(checkResult.checkItems, [("Good Check", .good)])
+            XCTAssertEqual(checkResult.todos, [])
+            XCTAssertEqual(checkResult.warnings, [])
+            XCTAssertEqual(checkResult.failures, [])
         }
         
         XCTContext.runActivity(named: "Add Check Item with Acceptable Result") { _ in
-            checkResult.check("Acceptable Check", execution: { .acceptable })
+            checkResult.checkItems.append(("Acceptable Check", .acceptable(warningMessage: "Warning")))
             XCTAssertEqual(checkResult.title, "Test Check")
-            XCTAssertEqual(checkResult.warningsCount, 1)
-            XCTAssertEqual(checkResult.errorsCount, 0)
-            XCTAssertEqual(checkResult.markdownTitle, "## Test Check")
-            XCTAssertEqual(checkResult.markdownMessage, """
-                                                        Checking Item | Result
-                                                        | ---| --- |
-                                                        Good Check | :tada:
-                                                        Acceptable Check | :thinking:
-                                                        """)
-            XCTAssertEqual(checkResult.markdownTodos, """
-                                                      """)
+            XCTAssertEqual(checkResult.checkItems, [("Good Check", .good),
+                                                    ("Acceptable Check", .acceptable(warningMessage: "Warning"))])
+            XCTAssertEqual(checkResult.todos, [])
+            XCTAssertEqual(checkResult.warnings, [("Acceptable Check", "Warning")])
+            XCTAssertEqual(checkResult.failures, [])
         }
         
         XCTContext.runActivity(named: "Add Check Item with Rejected Result") { _ in
-            checkResult.check("Rejected Check", execution: { .rejected })
+            checkResult.checkItems.append(("Rejected Check", .rejected(failureMessage: "Failure")))
             XCTAssertEqual(checkResult.title, "Test Check")
-            XCTAssertEqual(checkResult.warningsCount, 1)
-            XCTAssertEqual(checkResult.errorsCount, 1)
-            XCTAssertEqual(checkResult.markdownTitle, "## Test Check")
-            XCTAssertEqual(checkResult.markdownMessage, """
-                                                        Checking Item | Result
-                                                        | ---| --- |
-                                                        Good Check | :tada:
-                                                        Acceptable Check | :thinking:
-                                                        Rejected Check | :no_good:
-                                                        """)
-            XCTAssertEqual(checkResult.markdownTodos, """
-                                                      """)
+            XCTAssertEqual(checkResult.checkItems, [("Good Check", .good),
+                                                    ("Acceptable Check", .acceptable(warningMessage: "Warning")),
+                                                    ("Rejected Check", .rejected(failureMessage: "Failure"))])
+            XCTAssertEqual(checkResult.todos, [])
+            XCTAssertEqual(checkResult.warnings, [("Acceptable Check", "Warning")])
+            XCTAssertEqual(checkResult.failures, [("Rejected Check", "Failure")])
         }
         
         XCTContext.runActivity(named: "Add A Todo Item") { _ in
-            checkResult.askReviewer(to: "Do Something")
+            checkResult.todos.append("Do Something")
             XCTAssertEqual(checkResult.title, "Test Check")
-            XCTAssertEqual(checkResult.warningsCount, 1)
-            XCTAssertEqual(checkResult.errorsCount, 1)
-            XCTAssertEqual(checkResult.markdownTitle, "## Test Check")
-            XCTAssertEqual(checkResult.markdownMessage, """
-                                                        Checking Item | Result
-                                                        | ---| --- |
-                                                        Good Check | :tada:
-                                                        Acceptable Check | :thinking:
-                                                        Rejected Check | :no_good:
-                                                        """)
-            XCTAssertEqual(checkResult.markdownTodos, """
-                                                      - [ ] Do Something
-                                                      """)
+            XCTAssertEqual(checkResult.checkItems, [("Good Check", .good),
+                                                    ("Acceptable Check", .acceptable(warningMessage: "Warning")),
+                                                    ("Rejected Check", .rejected(failureMessage: "Failure"))])
+            XCTAssertEqual(checkResult.todos, ["Do Something"])
+            XCTAssertEqual(checkResult.warnings, [("Acceptable Check", "Warning")])
+            XCTAssertEqual(checkResult.failures, [("Rejected Check", "Failure")])
         }
         
         XCTContext.runActivity(named: "Add Another Todo Item") { _ in
-            checkResult.askReviewer(to: "Do Another Thing")
+            checkResult.todos.append("Do Another Thing")
             XCTAssertEqual(checkResult.title, "Test Check")
-            XCTAssertEqual(checkResult.warningsCount, 1)
-            XCTAssertEqual(checkResult.errorsCount, 1)
-            XCTAssertEqual(checkResult.markdownTitle, "## Test Check")
-            XCTAssertEqual(checkResult.markdownMessage, """
-                                                        Checking Item | Result
-                                                        | ---| --- |
-                                                        Good Check | :tada:
-                                                        Acceptable Check | :thinking:
-                                                        Rejected Check | :no_good:
-                                                        """)
-            XCTAssertEqual(checkResult.markdownTodos, """
-                                                      - [ ] Do Something
-                                                      - [ ] Do Another Thing
-                                                      """)
+            XCTAssertEqual(checkResult.checkItems, [("Good Check", .good),
+                                                    ("Acceptable Check", .acceptable(warningMessage: "Warning")),
+                                                    ("Rejected Check", .rejected(failureMessage: "Failure"))])
+            XCTAssertEqual(checkResult.todos, ["Do Something",
+                                               "Do Another Thing"])
+            XCTAssertEqual(checkResult.warnings, [("Acceptable Check", "Warning")])
+            XCTAssertEqual(checkResult.failures, [("Rejected Check", "Failure")])
         }
         
+    }
+    
+}
+
+private func XCTAssertEqual(_ itemA: [CheckResult.CheckItem], _ itemB: [CheckResult.CheckItem], line: UInt = #line) {
+    
+    XCTAssertEqual(itemA.count, itemB.count, line: line)
+    
+    for itemTuple in zip(itemA, itemB) {
+        XCTAssertEqual(itemTuple.0.title, itemTuple.1.title, line: line)
+        XCTAssertEqual(itemTuple.0.result, itemTuple.1.result, line: line)
+    }
+    
+}
+
+private func XCTAssertEqual(_ itemA: AnyCollection<CheckResult.WarningMessage>, _ itemB: [CheckResult.WarningMessage], line: UInt = #line) {
+    
+    XCTAssertEqual(itemA.count, itemB.count, line: line)
+    
+    for itemTuple in zip(itemA, itemB) {
+        XCTAssertEqual(itemTuple.0.title, itemTuple.1.title, line: line)
+        XCTAssertEqual(itemTuple.0.message, itemTuple.1.message, line: line)
     }
     
 }

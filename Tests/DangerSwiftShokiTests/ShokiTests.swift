@@ -23,7 +23,7 @@ final class ShokiTests: XCTestCase {
                 currentExpectation.expectation.fulfill()
                 
             case let invalid:
-                XCTFail("Invalid call from: \(invalid)", line: currentExpectation.line)
+                XCTFail(#"Invalid message. Expected: "\#(currentExpectation.input)"; Received: "\#(invalid)."#, line: currentExpectation.line)
             }
             expectations.removeFirst()
         }
@@ -35,8 +35,8 @@ final class ShokiTests: XCTestCase {
             
             let inputResult = { () -> CheckResult in
                 var result = CheckResult(title: "Good Result")
-                result.check("Good Check", execution: { .good })
-                result.askReviewer(to: "Good Todo")
+                result.checkItems.append(("Good Check", .good))
+                result.todos.append("Good Todo")
                 return result
             }()
             
@@ -62,7 +62,12 @@ final class ShokiTests: XCTestCase {
             let messageExecutor = makeExecutor([
                 (#line, expectedReward, rewardExpectation)
             ])
-            let shoki = Shoki(markdownExecutor: markdownExecutor, messageExecutor: messageExecutor)
+            let shoki = Shoki(
+                markdownExecutor: markdownExecutor,
+                messageExecutor: messageExecutor,
+                warningExecutor: { _ in XCTFail() },
+                failureExecutor: { _ in XCTFail() }
+            )
             
             shoki.report(inputResult)
             wait(for: [titleExpectation, messageExpectation, todosExpectation, rewardExpectation], timeout: 0, enforceOrder: true)
@@ -85,7 +90,12 @@ final class ShokiTests: XCTestCase {
             let messageExecutor = makeExecutor([
                 (#line, expectedReward, rewardExpectation),
             ])
-            let shoki = Shoki(markdownExecutor: markdownExecutor, messageExecutor: messageExecutor)
+            let shoki = Shoki(
+                markdownExecutor: markdownExecutor,
+                messageExecutor: messageExecutor,
+                warningExecutor: { _ in XCTFail() },
+                failureExecutor: { _ in XCTFail() }
+            )
             
             shoki.report(inputResult)
             wait(for: [titleExpectation, rewardExpectation], timeout: 0, enforceOrder: true)
@@ -96,12 +106,13 @@ final class ShokiTests: XCTestCase {
             
             let inputResult = { () -> CheckResult in
                 var result = CheckResult(title: "Rejected Result")
-                result.check("Rejected Check", execution: { .rejected })
+                result.checkItems.append(("Rejected Check", .rejected(failureMessage: nil)))
                 return result
             }()
             
             let titleExpectation = expectation(description: "Title")
             let messageExpectation = expectation(description: "Message")
+            let failureExpectation = expectation(description: "Failure")
             
             let expectedTitle = "## Rejected Result"
             let expectedMessage = """
@@ -109,16 +120,25 @@ final class ShokiTests: XCTestCase {
             | ---| --- |
             Rejected Check | :no_good:
             """
+            let expectedFailure = "Rejected Check failed."
             
             let markdownExecutor = makeExecutor([
                 (#line, expectedTitle, titleExpectation),
                 (#line, expectedMessage, messageExpectation),
             ])
             let messageExecutor = makeExecutor([])
-            let shoki = Shoki(markdownExecutor: markdownExecutor, messageExecutor: messageExecutor)
+            let failureExecutor = makeExecutor([
+                (#line, expectedFailure, failureExpectation),
+            ])
+            let shoki = Shoki(
+                markdownExecutor: markdownExecutor,
+                messageExecutor: messageExecutor,
+                warningExecutor: { _ in XCTFail() },
+                failureExecutor: failureExecutor
+            )
             
             shoki.report(inputResult)
-            wait(for: [titleExpectation, messageExpectation], timeout: 0, enforceOrder: true)
+            wait(for: [titleExpectation, messageExpectation, failureExpectation], timeout: 0, enforceOrder: true)
             
         }
         
