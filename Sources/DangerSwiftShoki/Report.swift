@@ -5,15 +5,21 @@
 //  Created by 史 翔新 on 2020/07/11.
 //
 
-public struct Report {
+public struct Report: Equatable {
     
-    public enum Result: Equatable {
-        case good
-        case acceptable(warningMessage: String?)
-        case rejected(failureMessage: String?)
+    public struct CheckItem: Equatable {
+        
+        public enum Result: Equatable {
+            case good
+            case acceptable(warningMessage: String?)
+            case rejected(failureMessage: String?)
+        }
+        
+        let title: String
+        let result: Result
+        
     }
     
-    public typealias CheckItem = (title: String, result: Result)
     public typealias WarningMessage = (title: String, message: String?)
     public typealias FailureMessage = (title: String, message: String?)
     
@@ -25,10 +31,10 @@ public struct Report {
     
     public var warnings: AnyCollection<WarningMessage> {
         
-        checkItems.lazy.compactMap { (title, result) in
-            switch result {
+        checkItems.lazy.compactMap { item in
+            switch item.result {
             case .acceptable(warningMessage: let warning):
-                return (title, warning)
+                return (item.title, warning)
                 
             case .good, .rejected:
                 return nil
@@ -40,10 +46,10 @@ public struct Report {
     
     public var failures: AnyCollection<FailureMessage> {
         
-        checkItems.compactMap { (title, result) in
-            switch result {
+        checkItems.compactMap { item in
+            switch item.result {
             case .rejected(failureMessage: let failure):
-                return (title, failure)
+                return (item.title, failure)
                 
             case .good, .acceptable:
                 return nil
@@ -115,7 +121,7 @@ public struct Report {
 @available(*, deprecated, renamed: "Report")
 public typealias CheckResult = Report
 
-private extension Report.Result {
+private extension Report.CheckItem.Result {
     
     var markdownSymbol: String {
         switch self {
