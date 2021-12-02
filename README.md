@@ -39,27 +39,29 @@ A danger-swift plug-in to manage/post danger checking results with markdown styl
 
 ## Usage
 
-- First of all create a result data structure with `CheckResult` initializer
+Basically just use `.shoki` property from a `DangerDSL` instance to access all features provided by DangerSwiftShoki
+
+Examples below assume you have initialized a `danger` using `Danger()` in your `Dangerfile.swift`
+
+- First of all create a report data structure with `makeInitialReport` method
 
     ```swift
-    var checkResult = CheckResult(title: "My Check")
+    var report = danger.shoki.makeInitialReport(title: "My Report")
     ```
 
-- Then you can perform any check with `check` method, by returning your check result in the trailing `execution` closure
+- Then you can perform any checks with `check` method, by returning your check result in the trailing `execution` closure
 
     ```swift
-    checkResult.check("Test Result Check") {
+    danger.shoki.check("Test Result Check", into: &report) {
         if testPassed {
             return .good
             
         } else {
             if isAcceptable {
-                warn("Encouraged to make a change but OK at this time")
-                return .acceptable
+                return .acceptable(warningMessage: "Encouraged to make a change but OK at this time")
                 
             } else {
-                fail("Must fix")
-                return .rejected
+                return .rejected(failureMessage: "Must fix")
             }
         }
     }
@@ -68,20 +70,20 @@ A danger-swift plug-in to manage/post danger checking results with markdown styl
 - You can also ask reviewers not to forget to do some manual checks with `askReviewer` method if needed
 
     ```swift
-    checkResult.askReviewer(to: "Check whether commit messages are correctly formatted or not")
+    danger.shoki.askReviewer(to: "Check whether commit messages are correctly formatted or not", into: $report)
     ```
 
-- At last post the whole check result with `shoki.report` method which is available for `DangerDSL` instances
+- At last post the whole check result with `report` method
 
     ```swift
-    danger.shoki.report(checkResult) // Assume you have initialized `danger` by code like `let danger = Danger()`
+    danger.shoki.report(report)
     ```
 
 ## Preview
 
 Code above will make danger producing markdown messages like below
 
-> ## My Check
+> ## My Report
 >
 > Checking Item | Result
 > | ---| --- |
