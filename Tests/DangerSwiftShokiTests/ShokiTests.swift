@@ -29,13 +29,149 @@ final class ShokiTests: XCTestCase {
         }
     }
     
-    func test_report() {
+    private func makeUnexpectedExecutor(line: UInt = #line) -> (String) -> Void {
+        return { _ in XCTFail(line: line) }
+    }
+    
+    private func dummyShoki(line: UInt = #line) -> Shoki {
+        .init(
+            markdownExecutor: makeUnexpectedExecutor(line: line),
+            messageExecutor: makeUnexpectedExecutor(line: line),
+            warningExecutor: makeUnexpectedExecutor(line: line),
+            failureExecutor: makeUnexpectedExecutor(line: line)
+        )
+    }
+    
+    func test_markdown() {
+        
+        let expectedInput = "My Markdown"
+        let executionExpectation = expectation(description: "Markdown")
+        let executor = makeExecutor([
+            (#line, expectedInput, executionExpectation),
+        ])
+        let shoki = Shoki(
+            markdownExecutor: executor,
+            messageExecutor: makeUnexpectedExecutor(),
+            warningExecutor: makeUnexpectedExecutor(),
+            failureExecutor: makeUnexpectedExecutor()
+        )
+        
+        shoki.markdown(expectedInput)
+        wait(for: [executionExpectation], timeout: 0)
+        
+    }
+    
+    func test_message() {
+        
+        let expectedInput = "My Message"
+        let executionExpectation = expectation(description: "Message")
+        let executor = makeExecutor([
+            (#line, expectedInput, executionExpectation),
+        ])
+        let shoki = Shoki(
+            markdownExecutor: makeUnexpectedExecutor(),
+            messageExecutor: executor,
+            warningExecutor: makeUnexpectedExecutor(),
+            failureExecutor: makeUnexpectedExecutor()
+        )
+        
+        shoki.message(expectedInput)
+        wait(for: [executionExpectation], timeout: 0)
+        
+    }
+    
+    func test_warn() {
+        
+        let expectedInput = "My Warn"
+        let executionExpectation = expectation(description: "Warn")
+        let executor = makeExecutor([
+            (#line, expectedInput, executionExpectation),
+        ])
+        let shoki = Shoki(
+            markdownExecutor: makeUnexpectedExecutor(),
+            messageExecutor: makeUnexpectedExecutor(),
+            warningExecutor: executor,
+            failureExecutor: makeUnexpectedExecutor()
+        )
+        
+        shoki.warn(expectedInput)
+        wait(for: [executionExpectation], timeout: 0)
+        
+    }
+    
+    func test_fail() {
+        
+        let expectedInput = "My Fail"
+        let executionExpectation = expectation(description: "Fail")
+        let executor = makeExecutor([
+            (#line, expectedInput, executionExpectation),
+        ])
+        let shoki = Shoki(
+            markdownExecutor: makeUnexpectedExecutor(),
+            messageExecutor: makeUnexpectedExecutor(),
+            warningExecutor: makeUnexpectedExecutor(),
+            failureExecutor: executor
+        )
+        
+        shoki.fail(expectedInput)
+        wait(for: [executionExpectation], timeout: 0)
+        
+    }
+    
+    func test_makeInitialReport() {
+        
+        let shoki = dummyShoki()
+        let report = shoki.makeInitialReport(title: "Title")
+        let expected = Report(title: "Title")
+        XCTAssertEqual(report, expected)
+        
+    }
+    
+    func test_check() {
+        
+        let shoki = dummyShoki()
+        var report = Report(title: "Title")
+        shoki.check("Check 1", into: &report, execution: { .good })
+        shoki.check("Check 2", into: &report, execution: { .acceptable(warningMessage: nil) })
+        shoki.check("Check 3", into: &report, execution: { .rejected(failureMessage: nil) })
+        let expected: Report = {
+            var report = Report(title: "Title")
+            report.checkItems = [
+                .init(title: "Check 1", result: .good),
+                .init(title: "Check 2", result: .acceptable(warningMessage: nil)),
+                .init(title: "Check 3", result: .rejected(failureMessage: nil)),
+            ]
+            return report
+        }()
+        XCTAssertEqual(report, expected)
+        
+    }
+    
+    func test_askReviewer() {
+        
+        let shoki = dummyShoki()
+        var report = Report(title: "Title")
+        shoki.askReviewer(to: "TODO 1", into: &report)
+        shoki.askReviewer(to: "TODO 2", into: &report)
+        let expected: Report = {
+            var report = Report(title: "Title")
+            report.todos = [
+                "TODO 1",
+                "TODO 2",
+            ]
+            return report
+        }()
+        XCTAssertEqual(report, expected)
+        
+    }
+    
+    func test_realWorldUsage() {
         
         XCTContext.runActivity(named: "Good CheckResult") { _ in
             
             let inputReport = { () -> Report in
                 var result = Report(title: "Good Result")
-                result.checkItems.append(("Good Check", .good))
+                result.checkItems.append(.init(title: "Good Check", result: .good))
                 result.todos.append("Good Todo")
                 return result
             }()
@@ -65,8 +201,8 @@ final class ShokiTests: XCTestCase {
             let shoki = Shoki(
                 markdownExecutor: markdownExecutor,
                 messageExecutor: messageExecutor,
-                warningExecutor: { _ in XCTFail() },
-                failureExecutor: { _ in XCTFail() }
+                warningExecutor: makeUnexpectedExecutor(),
+                failureExecutor: makeUnexpectedExecutor()
             )
             
             shoki.report(inputReport)
@@ -93,8 +229,8 @@ final class ShokiTests: XCTestCase {
             let shoki = Shoki(
                 markdownExecutor: markdownExecutor,
                 messageExecutor: messageExecutor,
-                warningExecutor: { _ in XCTFail() },
-                failureExecutor: { _ in XCTFail() }
+                warningExecutor: makeUnexpectedExecutor(),
+                failureExecutor: makeUnexpectedExecutor()
             )
             
             shoki.report(inputReport)
@@ -106,7 +242,7 @@ final class ShokiTests: XCTestCase {
             
             let inputReport = { () -> Report in
                 var result = Report(title: "Rejected Result")
-                result.checkItems.append(("Rejected Check", .rejected(failureMessage: nil)))
+                result.checkItems.append(.init(title: "Rejected Check", result: .rejected(failureMessage: nil)))
                 return result
             }()
             
@@ -133,7 +269,7 @@ final class ShokiTests: XCTestCase {
             let shoki = Shoki(
                 markdownExecutor: markdownExecutor,
                 messageExecutor: messageExecutor,
-                warningExecutor: { _ in XCTFail() },
+                warningExecutor: makeUnexpectedExecutor(),
                 failureExecutor: failureExecutor
             )
             
