@@ -50,6 +50,25 @@ extension Shoki {
 
 extension Shoki {
     
+    public func makeInitialCheckResult(title: String) -> CheckResult {
+        
+        .init(title: title)
+        
+    }
+    
+    public func check(_ title: String, into result: inout CheckResult, execution: () -> CheckResult.Result) {
+        
+        let executionResult = execution()
+        result.checkItems.append((title, executionResult))
+        
+    }
+    
+    public func askReviewer(to taskToDo: String, into result: inout CheckResult) {
+        
+        result.todos.append(taskToDo)
+        
+    }
+    
     public func report(_ result: CheckResult, using configuration: MarkdownConfiguration = .default) {
         
         let markdownTitle = configuration.titleMarkdownFormatter(result.title)

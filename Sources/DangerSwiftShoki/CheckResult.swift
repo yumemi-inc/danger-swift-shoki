@@ -19,13 +19,13 @@ public struct CheckResult {
     
     public let title: String
     
-    private(set) public var checkItems: [CheckItem] = []
+    internal(set) public var checkItems: [CheckItem] = []
     
-    private(set) public var todos: [String] = []
+    internal(set) public var todos: [String] = []
     
-    public var warnings: LazySequence<[WarningMessage]> {
+    public var warnings: AnyCollection<WarningMessage> {
         
-        checkItems.compactMap { (title, result) in
+        checkItems.lazy.compactMap { (title, result) in
             switch result {
             case .acceptable(warningMessage: let warning):
                 return (title, warning)
@@ -33,11 +33,12 @@ public struct CheckResult {
             case .good, .rejected:
                 return nil
             }
-        }.lazy
+        }
+        .eraseToAnyCollection()
         
     }
     
-    public var failures: LazySequence<[FailureMessage]> {
+    public var failures: AnyCollection<FailureMessage> {
         
         checkItems.compactMap { (title, result) in
             switch result {
@@ -47,7 +48,8 @@ public struct CheckResult {
             case .good, .acceptable:
                 return nil
             }
-        }.lazy
+        }
+        .eraseToAnyCollection()
         
     }
     
@@ -61,21 +63,8 @@ public struct CheckResult {
         failures.count
     }
     
-    public init(title: String) {
+    init(title: String) {
         self.title = title
-    }
-    
-    public mutating func askReviewer(to taskToDo: String) {
-        
-        todos.append(taskToDo)
-        
-    }
-    
-    public mutating func check(_ item: String, execution: () -> Result) {
-        
-        let result = execution()
-        checkItems.append((item, result))
-        
     }
     
     @available(*, deprecated, message: "It's `Shoki`'s responsibility to format a message, not `CheckResult`'s, so stop using this property to get the formatted title, which you shouldn't have to care at first place.")
@@ -135,6 +124,14 @@ private extension CheckResult.Result {
         case .rejected:
             return ":no_good:"
         }
+    }
+    
+}
+
+private extension Collection {
+    
+    func eraseToAnyCollection() -> AnyCollection<Element> {
+        .init(self)
     }
     
 }
