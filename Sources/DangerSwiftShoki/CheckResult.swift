@@ -7,41 +7,58 @@
 
 public struct CheckResult {
     
-    public enum Result {
-        
+    public enum Result: Equatable {
         case good
-        case acceptable
-        case rejected
-        
-        var markdownSymbol: String {
-            switch self {
-            case .good:
-                return ":tada:"
-                
-            case .acceptable:
-                return ":thinking:"
-                
-            case .rejected:
-                return ":no_good:"
-            }
-        }
-        
+        case acceptable(warningMessage: String?)
+        case rejected(failureMessage: String?)
     }
     
-    typealias Message = (content: String, result: Result)
+    public typealias CheckItem = (title: String, result: Result)
+    public typealias WarningMessage = (title: String, message: String?)
+    public typealias FailureMessage = (title: String, message: String?)
     
     public let title: String
     
-    private var messages: [Message] = []
+    private(set) public var checkItems: [CheckItem] = []
     
-    private var todos: [String] = []
+    private(set) public var todos: [String] = []
     
-    public var warningsCount: Int {
-        messages.filter({ $0.result == .acceptable }).count
+    public var warnings: LazySequence<[WarningMessage]> {
+        
+        checkItems.compactMap { (title, result) in
+            switch result {
+            case .acceptable(warningMessage: let warning):
+                return (title, warning)
+                
+            case .good, .rejected:
+                return nil
+            }
+        }.lazy
+        
     }
     
+    public var failures: LazySequence<[FailureMessage]> {
+        
+        checkItems.compactMap { (title, result) in
+            switch result {
+            case .rejected(failureMessage: let failure):
+                return (title, failure)
+                
+            case .good, .acceptable:
+                return nil
+            }
+        }.lazy
+        
+    }
+    
+    @available(*, deprecated, renamed: "warnings.count")
+    public var warningsCount: Int {
+        warnings.count
+    }
+    
+    @available(*, deprecated, renamed: "failures.count")
     public var errorsCount: Int {
-        messages.filter({ $0.result == .rejected }).count
+        failures.count
     }
     
     public init(title: String) {
@@ -57,19 +74,21 @@ public struct CheckResult {
     public mutating func check(_ item: String, execution: () -> Result) {
         
         let result = execution()
-        messages.append((item, result))
+        checkItems.append((item, result))
         
     }
     
+    @available(*, deprecated, message: "It's `Shoki`'s responsibility to format a message, not `CheckResult`'s, so stop using this property to get the formatted title, which you shouldn't have to care at first place.")
     public var markdownTitle: String {
         
         "## " + title
         
     }
     
+    @available(*, deprecated, message: "It's `Shoki`'s responsibility to format a message, not `CheckResult`'s, so stop using this property to get the formatted message, which you shouldn't have to care at first place.")
     public var markdownMessage: String {
         
-        guard !messages.isEmpty else {
+        guard !checkItems.isEmpty else {
             return ""
         }
         
@@ -78,14 +97,15 @@ public struct CheckResult {
             | ---| --- |
             
             """
-        let chartContent = messages.map {
-            "\($0.content) | \($0.result.markdownSymbol)"
+        let chartContent = checkItems.map {
+            "\($0.title) | \($0.result.markdownSymbol)"
         } .joined(separator: "\n")
         
         return chartHeader + chartContent
         
     }
     
+    @available(*, deprecated, message: "It's `Shoki`'s responsibility to format a message, not `CheckResult`'s, so stop using this property to get the formatted todos, which you shouldn't have to care at first place.")
     public var markdownTodos: String {
         
         guard !todos.isEmpty else {
@@ -98,6 +118,23 @@ public struct CheckResult {
         
         return todoContent.joined(separator: "\n")
         
+    }
+    
+}
+
+private extension CheckResult.Result {
+    
+    var markdownSymbol: String {
+        switch self {
+        case .good:
+            return ":tada:"
+            
+        case .acceptable:
+            return ":thinking:"
+            
+        case .rejected:
+            return ":no_good:"
+        }
     }
     
 }
