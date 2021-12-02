@@ -3,93 +3,43 @@ import XCTest
 
 final class ReportTests: XCTestCase {
     
-    func test_reportUsageScenario() {
+    private func dummyReport() -> Report {
+        var report = Report(title: "")
+        report.checkItems = [
+            .init(title: "GOOD", result: .good),
+            .init(title: "WARNING 1", result: .acceptable(warningMessage: "Warning Message")),
+            .init(title: "WARNING 2", result: .acceptable(warningMessage: nil)),
+            .init(title: "FAILURE 1", result: .rejected(failureMessage: "Failure Message")),
+            .init(title: "FAILURE 2", result: .rejected(failureMessage: nil)),
+        ]
+        return report
+    }
+    
+    func test_warnings() {
         
-        var checkResult = Report(title: "Test Check")
+        let inputReport = dummyReport()
+        XCTAssertEqual(inputReport.warnings, [("WARNING 1", "Warning Message"), ("WARNING 2", nil)])
         
-        XCTContext.runActivity(named: "Initialize CheckResult") { _ in
-            XCTAssertEqual(checkResult.title, "Test Check")
-            XCTAssertEqual(checkResult.checkItems, [])
-            XCTAssertEqual(checkResult.todos, [])
-            XCTAssertEqual(checkResult.warnings, [])
-            XCTAssertEqual(checkResult.failures, [])
-        }
+    }
+    
+    func test_failures() {
         
-        XCTContext.runActivity(named: "Add Check Item with Good Result") { _ in
-            checkResult.checkItems.append(("Good Check", .good))
-            XCTAssertEqual(checkResult.title, "Test Check")
-            XCTAssertEqual(checkResult.checkItems, [("Good Check", .good)])
-            XCTAssertEqual(checkResult.todos, [])
-            XCTAssertEqual(checkResult.warnings, [])
-            XCTAssertEqual(checkResult.failures, [])
-        }
-        
-        XCTContext.runActivity(named: "Add Check Item with Acceptable Result") { _ in
-            checkResult.checkItems.append(("Acceptable Check", .acceptable(warningMessage: "Warning")))
-            XCTAssertEqual(checkResult.title, "Test Check")
-            XCTAssertEqual(checkResult.checkItems, [("Good Check", .good),
-                                                    ("Acceptable Check", .acceptable(warningMessage: "Warning"))])
-            XCTAssertEqual(checkResult.todos, [])
-            XCTAssertEqual(checkResult.warnings, [("Acceptable Check", "Warning")])
-            XCTAssertEqual(checkResult.failures, [])
-        }
-        
-        XCTContext.runActivity(named: "Add Check Item with Rejected Result") { _ in
-            checkResult.checkItems.append(("Rejected Check", .rejected(failureMessage: "Failure")))
-            XCTAssertEqual(checkResult.title, "Test Check")
-            XCTAssertEqual(checkResult.checkItems, [("Good Check", .good),
-                                                    ("Acceptable Check", .acceptable(warningMessage: "Warning")),
-                                                    ("Rejected Check", .rejected(failureMessage: "Failure"))])
-            XCTAssertEqual(checkResult.todos, [])
-            XCTAssertEqual(checkResult.warnings, [("Acceptable Check", "Warning")])
-            XCTAssertEqual(checkResult.failures, [("Rejected Check", "Failure")])
-        }
-        
-        XCTContext.runActivity(named: "Add A Todo Item") { _ in
-            checkResult.todos.append("Do Something")
-            XCTAssertEqual(checkResult.title, "Test Check")
-            XCTAssertEqual(checkResult.checkItems, [("Good Check", .good),
-                                                    ("Acceptable Check", .acceptable(warningMessage: "Warning")),
-                                                    ("Rejected Check", .rejected(failureMessage: "Failure"))])
-            XCTAssertEqual(checkResult.todos, ["Do Something"])
-            XCTAssertEqual(checkResult.warnings, [("Acceptable Check", "Warning")])
-            XCTAssertEqual(checkResult.failures, [("Rejected Check", "Failure")])
-        }
-        
-        XCTContext.runActivity(named: "Add Another Todo Item") { _ in
-            checkResult.todos.append("Do Another Thing")
-            XCTAssertEqual(checkResult.title, "Test Check")
-            XCTAssertEqual(checkResult.checkItems, [("Good Check", .good),
-                                                    ("Acceptable Check", .acceptable(warningMessage: "Warning")),
-                                                    ("Rejected Check", .rejected(failureMessage: "Failure"))])
-            XCTAssertEqual(checkResult.todos, ["Do Something",
-                                               "Do Another Thing"])
-            XCTAssertEqual(checkResult.warnings, [("Acceptable Check", "Warning")])
-            XCTAssertEqual(checkResult.failures, [("Rejected Check", "Failure")])
-        }
+        let inputReport = dummyReport()
+        XCTAssertEqual(inputReport.failures, [("FAILURE 1", "Failure Message"), ("FAILURE 2", nil)])
         
     }
     
 }
 
-private func XCTAssertEqual(_ itemA: [Report.CheckItem], _ itemB: [Report.CheckItem], line: UInt = #line) {
+private func XCTAssertEqual(_ anyCollection: AnyCollection<Report.WarningMessage>, _ array: Array<Report.WarningMessage>, line: UInt = #line) {
     
-    XCTAssertEqual(itemA.count, itemB.count, line: line)
-    
-    for itemTuple in zip(itemA, itemB) {
-        XCTAssertEqual(itemTuple.0.title, itemTuple.1.title, line: line)
-        XCTAssertEqual(itemTuple.0.result, itemTuple.1.result, line: line)
+    guard anyCollection.count == array.count else {
+        return XCTFail(line: line)
     }
     
-}
-
-private func XCTAssertEqual(_ itemA: AnyCollection<Report.WarningMessage>, _ itemB: [Report.WarningMessage], line: UInt = #line) {
-    
-    XCTAssertEqual(itemA.count, itemB.count, line: line)
-    
-    for itemTuple in zip(itemA, itemB) {
-        XCTAssertEqual(itemTuple.0.title, itemTuple.1.title, line: line)
-        XCTAssertEqual(itemTuple.0.message, itemTuple.1.message, line: line)
+    for tuple in zip(anyCollection, array) {
+        XCTAssertEqual(tuple.0.title, tuple.1.title, line: line)
+        XCTAssertEqual(tuple.0.message, tuple.1.message, line: line)
     }
     
 }
