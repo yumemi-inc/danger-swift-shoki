@@ -46,7 +46,7 @@ public struct Report: Equatable {
     
     public var failures: AnyCollection<FailureMessage> {
         
-        checkItems.compactMap { item in
+        checkItems.lazy.compactMap { item in
             switch item.result {
             case .rejected(failureMessage: let failure):
                 return (item.title, failure)
