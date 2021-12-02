@@ -56,10 +56,10 @@ extension Shoki {
         
     }
     
-    public func check(_ title: String, into report: inout Report, execution: () -> Report.Result) {
+    public func check(_ title: String, into report: inout Report, execution: () -> Report.CheckItem.Result) {
         
         let executionResult = execution()
-        report.checkItems.append((title, executionResult))
+        report.checkItems.append(.init(title: title, result: executionResult))
         
     }
     

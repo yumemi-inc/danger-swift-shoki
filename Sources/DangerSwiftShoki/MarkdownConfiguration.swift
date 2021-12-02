@@ -95,7 +95,7 @@ public struct MarkdownConfiguration {
     
 }
 
-private extension Report.Result {
+private extension Report.CheckItem.Result {
     
     var markdownSymbol: String {
         switch self {
