@@ -10,8 +10,12 @@ import Danger
 extension DangerDSL {
     
     public var shoki: Shoki {
-        return .init(markdownExecutor: { markdown($0) },
-                     messageExecutor: { message($0) })
+        return .init(
+            markdownExecutor: { markdown($0) },
+            messageExecutor: { message($0) },
+            warningExecutor: { warn($0) },
+            failureExecutor: { fail($0) }
+        )
     }
     
 }
