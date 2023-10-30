@@ -1,3 +1,7 @@
+[![Build](https://github.com/yumemi-inc/danger-swift-shoki/actions/workflows/build.yml/badge.svg)](https://github.com/yumemi-inc/danger-swift-shoki/actions/workflows/test.yml)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fyumemi-inc%2Fdanger-swift-shoki%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/yumemi-inc/danger-swift-shoki)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fyumemi-inc%2Fdanger-swift-shoki%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/yumemi-inc/danger-swift-shoki)
+
 # DangerSwiftShoki
 
 A danger-swift plug-in to manage/post danger checking results with markdown style
