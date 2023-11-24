@@ -15,7 +15,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Run tests
-      run: swift test
+      run: |
+        swift --version
+        swift test
     - name: Danger
       if: github.event_name == 'pull_request'
       env:

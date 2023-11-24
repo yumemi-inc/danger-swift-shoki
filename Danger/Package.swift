@@ -14,7 +14,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/SwiftLint", from: "0.54.0"),
+        .package(url: "https://github.com/realm/SwiftLint", from: "0.53.0"),
         // Danger
         .package(name: "danger-swift", url: "https://github.com/danger/swift.git", from: "3.17.1"),
         // Danger Plugins

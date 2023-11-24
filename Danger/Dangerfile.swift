@@ -1,6 +1,6 @@
 import Foundation
 import Danger
-import DangerSwiftEda // package: https://github.com/yumemi-inc/danger-swift-eda.git
+import DangerSwiftEda
 
 // MARK: - チェックルーチン
 let danger = Danger()
