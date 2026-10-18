@@ -16,7 +16,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/realm/SwiftLint", from: "0.65.1"),
         // Danger
-        .package(name: "danger-swift", url: "https://github.com/danger/swift.git", from: "3.23.0"),
+        .package(name: "danger-swift", url: "https://github.com/danger/swift.git", from: "3.23.1"),
         // Danger Plugins
         .package(name: "DangerSwiftEda", url: "https://github.com/yumemi-inc/danger-swift-eda", from: "0.3.0"),
     ],
